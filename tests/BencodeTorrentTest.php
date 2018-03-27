@@ -77,6 +77,24 @@ class BencodeTorrentTest extends TestCase {
 	}
 
 	public function testSetData() {
+	    $data = [
+	        'encoding' => 'UTF8',
+            'info' => [
+                'name' => 'test',
+                'length' => 1213134,
+                'pieces' => 'fake pieces string'
+            ]
+        ];
 
+	    $bencode = new BencodeTorrent();
+	    try {
+            $bencode->setData($data);
+        }
+        catch (\Exception $exc) {
+	        $this->fail('Exception should not have been thrown');
+        }
+
+        $data = $bencode->getData();
+        $this->assertEquals('UTF8', $data['encoding']);
 	}
 }
