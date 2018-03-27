@@ -1,0 +1,5 @@
+.idea/
+report/
+vendor/
+.DS_Store
+composer.lock
