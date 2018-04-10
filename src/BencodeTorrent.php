@@ -46,26 +46,30 @@ class BencodeTorrent {
     }
 
     /**
+     * Sets the internal data array
      * @param array $data
-     * @throws \Exception
+     * @throws \RuntimeException
      */
-    public function setData($data) {
+    public function setData(array $data) {
         $this->data = $data;
         $this->validate();
     }
 
     /**
+     * Given a BEncoded string and decode it
      * @param string $data
-     * @throws \Exception
+     * @throws \RuntimeException
      */
-    public function decodeData(string $data) {
+    public function decodeString(string $data) {
         $this->data = $this->decode($data);
         $this->validate();
     }
 
     /**
+     * Given a path to a file, decode the contents of it
+     *
      * @param string $path
-     * @throws \Exception
+     * @throws \RuntimeException
      */
     public function decodeFile(string $path) {
         $this->data = $this->decode(file_get_contents($path, FILE_BINARY));
@@ -73,6 +77,14 @@ class BencodeTorrent {
     }
 
     /**
+     * Decodes a BEncoded string to the following values:
+     * - Dictionary (starts with d, ends with e)
+     * - List (starts with l, ends with e
+     * - Integer (starts with i, ends with e
+     * - String (starts with number denoting number of characters followed by : and then the string)
+     *
+     * @see https://wiki.theory.org/index.php/BitTorrentSpecification
+     *
      * @param string $data
      * @param int    $pos
      * @return array|bool|float|string
@@ -89,6 +101,7 @@ class BencodeTorrent {
                 }
                 $return[$key] = $value;
             }
+            ksort($return);
             $pos++;
         }
         elseif ($data[$pos] === 'l') {
@@ -116,16 +129,37 @@ class BencodeTorrent {
         return $return;
     }
 
-    public function getData() {
+    /**
+     * Get the internal data array
+     * @return array
+     */
+    public function getData() : array {
         return $this->data;
     }
 
     /**
-     * @throws \Exception
+     * Validates that the internal data array
+     * @throws \RuntimeException
      */
     public function validate() {
         if (empty($this->data['info'])) {
-            throw new \Exception("Torrent dictionary doesn't have info key");
+            throw new \RuntimeException("Torrent dictionary doesn't have info key");
+        }
+        if (isset($this->data['info']['files'])) {
+            foreach ($this->data['info']['files'] as $file) {
+                $path_key = isset($file['path.utf-8']) ? 'path.utf-8' : 'path';
+                if (isset($file[$path_key])) {
+                    $filter = array_filter(
+                        $file[$path_key],
+                        function ($element) {
+                            return strlen($element) === 0;
+                        }
+                    );
+                    if (count($filter) > 0) {
+                        throw new \RuntimeException('Cannot have empty path for a file');
+                    }
+                }
+            }
         }
     }
 
@@ -141,7 +175,7 @@ class BencodeTorrent {
     /**
      * @return string
      */
-    public function getEncode() {
+    public function getEncode() : string {
         $this->hasData();
         return $this->encodeVal($this->data);
     }
@@ -150,7 +184,7 @@ class BencodeTorrent {
      * @param mixed $data
      * @return string
      */
-    private function encodeVal($data) {
+    private function encodeVal($data) : string {
         if (is_array($data)) {
             $return = '';
             $check = -1;
@@ -194,7 +228,7 @@ class BencodeTorrent {
      *
      * @return bool flag to indicate if we altered the info dictionary
      */
-    public function clean() {
+    public function clean() : bool {
         $this->cleanDataDictionary();
         return $this->cleanInfoDictionary();
     }
@@ -206,9 +240,9 @@ class BencodeTorrent {
      */
     public function cleanDataDictionary() {
         $allowed_keys = array('encoding', 'info');
-        foreach ($this->data['info'] as $key => $value) {
+        foreach ($this->data as $key => $value) {
             if (!in_array($key, $allowed_keys)) {
-                unset($this->data['info'][$key]);
+                unset($this->data[$key]);
             }
         }
     }
@@ -227,7 +261,7 @@ class BencodeTorrent {
      *
      * @return bool
      */
-    public function cleanInfoDictionary() {
+    public function cleanInfoDictionary() : bool {
         $cleaned = false;
         $allowed_keys = array('files', 'name', 'piece length', 'pieces', 'private', 'length',
                               'name.utf8', 'name.utf-8', 'md5sum', 'sha1', 'source',
@@ -247,7 +281,7 @@ class BencodeTorrent {
      *
      * @return bool
      */
-    public function isPrivate() {
+    public function isPrivate() : bool {
         $this->hasData();
         return isset($this->data['info']['private']) && $this->data['info']['private'] === 1;
     }
@@ -261,7 +295,7 @@ class BencodeTorrent {
      *
      * @return bool
      */
-    public function makePrivate() {
+    public function makePrivate() : bool {
         $this->hasData();
         if ($this->isPrivate()) {
             return false;
@@ -282,58 +316,48 @@ class BencodeTorrent {
      *
      * @return bool true if the source was set/changed, false if no change
      */
-    public function setSource(string $source) {
+    public function setSource(string $source) : bool {
         $this->hasData();
         if (isset($this->data['info']['source']) && $this->data['info']['source'] === $source) {
             return false;
         }
-        // Set we've set the source and will require a download, we might as well clean
+        // Since we've set the source and will require a re-download, we might as well clean
         // these out as well
         unset($this->data['info']['x_cross_seed']);
         unset($this->data['info']['unique']);
-        $this->data['info']['source'] = $source;
-        ksort($this->data['info']);
+        $this->setValue(['info.source' => $source]);
         return true;
     }
 
     /**
-     * Function to allow you set any number of keys and values in the data dictionary.
+     * Function to allow you set any number of keys and values in the data dictionary. You can
+     * set the value in a dictionary by concatenating the keys into a string with a period
+     * separator (ex: info.name will set name field in the info dictionary) so that the rest
+     * of the dictionary is unaffected.
+     *
      * @param array $array
      */
-    public function set(array $array) {
+    public function setValue(array $array) {
         foreach ($array as $key => $value) {
-            $this->data[$key] = $value;
             if (is_array($value)) {
-                ksort($this->data[$key]);
+                ksort($value);
+            }
+            $keys = explode('.', $key);
+            $data = &$this->data;
+            for ($i = 0; $i < count($keys); $i++) {
+                $data = &$data[$keys[$i]];
+            }
+            $data = $value;
+            $data = &$this->data;
+            for ($i = 0; $i < count($keys); $i++) {
+                $data = &$data[$keys[$i]];
+                if (is_array($data)) {
+                    ksort($data);
+                }
             }
         }
         ksort($this->data);
-    }
-
-    /**
-     * Sets the announce URL for current data. This URL forms the base of the GET request that
-     * the torrent client will send to a tracker so that a client can get peer lists as well as
-     * tell the tracker the stats on the download. The announce URL should probably also end with
-     * /announce which allows for the more efficient scrape to happen on an initial handshake by
-     * the client and when getting just the peer list.
-     *
-     * @see https://wiki.theory.org/index.php/BitTorrentSpecification#Tracker_HTTP.2FHTTPS_Protocol
-     * @see https://wiki.theory.org/index.php/BitTorrentSpecification#Tracker_.27scrape.27_Convention
-     *
-     * @param string $announce_url
-     */
-    public function setAnnounceUrl(string $announce_url) {
-        $this->hasData();
-        $this->set(['announce' => $announce_url]);
-    }
-
-    /**
-     * Sets the comment string for the current data. This does not affect the info_hash.
-     * @param string $comment
-     */
-    public function setComment(string $comment) {
-        $this->hasData();
-        $this->set(['comment' => $comment]);
+        $this->validate();
     }
 
     /**
@@ -346,9 +370,13 @@ class BencodeTorrent {
      *
      * @return string
      */
-    public function getInfoHash() {
+    public function getInfoHash() : string {
         $this->hasData();
         return sha1($this->encodeVal($this->data['info']));
+    }
+
+    public function getHexInfoHash(): string {
+        return pack('H*', $this->getInfoHash());
     }
 
     /**
@@ -368,7 +396,7 @@ class BencodeTorrent {
      *
      * @return int
      */
-    public function getSize() {
+    public function getSize() : int {
         $cur_size = 0;
         if (!isset($this->data['info']['files'])) {
             $cur_size = $this->data['info']['length'];
@@ -390,7 +418,7 @@ class BencodeTorrent {
      *
      * @return array
      */
-    public function getFileList() {
+    public function getFileList() : array {
         $files = [];
         if (!isset($this->data['info']['files'])) {
             // Single-file torrent
@@ -431,12 +459,12 @@ class BencodeTorrent {
      *
      * @return array
      */
-    public function getGazelleFileList() {
+    public function getGazelleFileList() : array {
         $files = [];
         foreach ($this->getFileList() as $file) {
             $name = $file['name'];
-            $size = $file['length'];
-            $name = self::makeUTF8(strtr($name, "\n\r\t", '   '));
+            $size = $file['size'];
+            $name = $this->makeUTF8(strtr($name, "\n\r\t", '   '));
             $ext_pos = strrpos($name, '.');
             // Should not be $ExtPos !== false. Extension-less files that start with a .
             // should not get extensions
@@ -449,52 +477,28 @@ class BencodeTorrent {
     /**
      * Given a string, convert it to UTF-8 format, if it's not already in UTF-8.
      *
-     * @param string $Str input to convert to utf-8 format
+     * @param string $str input to convert to utf-8 format
      *
      * @return string
      */
-    private static function makeUTF8($Str) {
-        if ($Str != '') {
-            if (self::isUTF8($Str)) {
-                $Encoding = 'UTF-8';
-            }
-            if (empty($Encoding)) {
-                $Encoding = mb_detect_encoding($Str, 'UTF-8, ISO-8859-1');
-            }
-            if (empty($Encoding)) {
-                $Encoding = 'ISO-8859-1';
-            }
-            if ($Encoding == 'UTF-8') {
-                return $Str;
-            }
-            else {
-                return @mb_convert_encoding($Str, 'UTF-8', $Encoding);
-            }
+    private function makeUTF8(string $str) : string {
+        if (preg_match('//u', $str)) {
+            $encoding = 'UTF-8';
         }
-        return $Str;
-    }
-
-    /**
-     * Given a string, determine if that string is encoded in UTF-8 via regular expressions,
-     * so that we don't have to rely on mb_detect_encoding which isn't quite as accurate
-     *
-     * @param string $Str input to check encoding of
-     *
-     * @return false|int
-     */
-    private static function isUTF8($Str) {
-        return preg_match(
-            '%^(?:
-            [\x09\x0A\x0D\x20-\x7E]              // ASCII
-            | [\xC2-\xDF][\x80-\xBF]             // non-overlong 2-byte
-            | \xE0[\xA0-\xBF][\x80-\xBF]         // excluding overlongs
-            | [\xE1-\xEC\xEE\xEF][\x80-\xBF]{2}  // straight 3-byte
-            | \xED[\x80-\x9F][\x80-\xBF]         // excluding surrogates
-            | \xF0[\x90-\xBF][\x80-\xBF]{2}      // planes 1-3
-            | [\xF1-\xF3][\x80-\xBF]{3}          // planes 4-15
-            | \xF4[\x80-\x8F][\x80-\xBF]{2}      // plane 16
-            )*$%xs',
-            $Str
-        );
+        if (empty($encoding)) {
+            $encoding = mb_detect_encoding($str, 'UTF-8, ISO-8859-1');
+        }
+        // Legacy thing for Gazelle, leaving it in, but not going to bother testing
+        // @codeCoverageIgnoreStart
+        if (empty($encoding)) {
+            $encoding = 'ISO-8859-1';
+        }
+        // @codeCoverageIgnoreEnd
+        if ($encoding === 'UTF-8') {
+            return $str;
+        }
+        else {
+            return @mb_convert_encoding($str, 'UTF-8', $encoding);
+        }
     }
 }
