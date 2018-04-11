@@ -310,6 +310,7 @@ class BencodeTorrentTest extends TestCase {
             ['.mp3 s1234s 01 Test??.mp3 ÷', '.mp3 s2345s 03 Test.mp3 ÷'],
             $bencode->getGazelleFileList()
         );
+        $this->assertTrue($bencode->hasFiles());
     }
 
     public function testGetUtf8Name() {
@@ -340,6 +341,7 @@ class BencodeTorrentTest extends TestCase {
         $bencode = new BencodeTorrent();
         $bencode->setData($data);
         $this->assertEquals(['.,!?)óÉ s1234s (test.,!?)óÉ ÷'], $bencode->getGazelleFileList());
+        $this->assertFalse($bencode->hasFiles());
     }
 
     /**

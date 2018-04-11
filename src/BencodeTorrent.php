@@ -449,6 +449,10 @@ class BencodeTorrent {
         return $files;
     }
 
+    public function hasFiles(): bool {
+        return isset($this->data['info']['files']);
+    }
+
     /**
      * Returns an array of strings formatted to be inserted into a Gazelle database into the table
      * torrents.FileList which is then used for displaying the table of files to the user when
