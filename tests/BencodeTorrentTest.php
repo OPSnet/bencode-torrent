@@ -92,6 +92,57 @@ class BencodeTorrentTest extends TestCase {
         $this->assertStringEqualsFile(__DIR__.'/data/test_1.torrent', $bencode->getEncode());
         $this->assertEquals('1f830103427029a88dd5fde85be74e622ee07951', $bencode->getInfoHash());
         $this->assertEquals($bencode->getInfoHash(), unpack('H*', $bencode->getHexInfoHash())[1]);
+        $this->assertFalse($bencode->hasEncryptedFiles());
+        $file_list = [
+            'total_size' => 104916260,
+            'files' => [
+                [
+                    'size' => 9584196,
+                    'path' => '01 Death with Dignity.mp3'
+                ],
+                [
+                    'size' => 12310347,
+                    'path' => '02 Should have known better.mp3'
+                ],
+                [
+                    'size' => 8871591,
+                    'path' => '03 All of me wants all of you.mp3'
+                ],
+                [
+                    'size' => 7942661,
+                    'path' => '04 Drawn to the Blood.mp3'
+                ],
+                [
+                    'size' => 5878964,
+                    'path' => '05 Eugene.mp3'
+                ],
+                [
+                    'size' => 11175567,
+                    'path' => '06 Fourth of July.mp3'
+                ],
+                [
+                    'size' => 11367829,
+                    'path' => '07 The Only Thing.mp3'
+                ],
+                [
+                    'size' => 7789055,
+                    'path' => '08 Carrie & Lowell.mp3'
+                ],
+                [
+                    'size' => 12197480,
+                    'path' => '09 John My Beloved.mp3'
+                ],
+                [
+                    'size' => 6438044,
+                    'path' => '10 No shade in the shadow of the cross.mp3'
+                ],
+                [
+                    'size' => 11360526,
+                    'path' => '11 Blue Bucket of Gold.mp3'
+                ]
+            ]
+        ];
+        $this->assertEquals($file_list, $bencode->getFileList());
     }
 
     public function testSetData() {
@@ -112,7 +163,18 @@ class BencodeTorrentTest extends TestCase {
         $this->assertEquals('test', $bencode->getName());
         $this->assertFalse($bencode->isPrivate());
         $this->assertEquals(1213134, $bencode->getSize());
-        $this->assertEquals([['name' => 'test', 'size' => 1213134]], $bencode->getFileList());
+        $this->assertEquals(
+            [
+                'total_size' => 1213134,
+                'files' => [
+                    [
+                        'path' => 'test',
+                        'size' => 1213134
+                    ]
+                ]
+            ],
+            $bencode->getFileList()
+        );
     }
 
     public function testEmptyDictionary() {
@@ -327,7 +389,18 @@ class BencodeTorrentTest extends TestCase {
         $bencode->setData($data);
         $this->assertEquals('test!!', $bencode->getName());
         $this->assertEquals(12345, $bencode->getSize());
-        $this->assertEquals([['name' => 'test!!', 'size' => 12345]], $bencode->getFileList());
+        $this->assertEquals(
+            [
+                'total_size' => 12345,
+                'files' => [
+                    [
+                        'path' => 'test!!',
+                        'size' => 12345
+                    ]
+                ]
+            ],
+            $bencode->getFileList()
+        );
         $this->assertEquals(['. s12345s test!! ÷'], $bencode->getGazelleFileList());
     }
 

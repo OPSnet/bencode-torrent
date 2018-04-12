@@ -426,31 +426,31 @@ class BencodeTorrent {
                 $this->data['info']['name.utf-8'] :
                 $this->data['info']['name']);
             $size = $this->data['info']['length'];
-            $files[] = array('name' => $name, 'size' => $size);
+            $files[] = ['path' => $name, 'size' => $size];
         }
         else {
-            $path_key = isset($this->data['info']['files'][0]['path.utf-8']) ?
-                'path.utf-8' :
-                'path';
+            $size = 0;
             foreach ($this->data['info']['files'] as $file) {
-                $tmp_path = array();
-                foreach ($file[$path_key] as $sub_path) {
-                    $tmp_path[] = $sub_path;
-                }
-                $files[] = array('name' => implode('/', $tmp_path), 'size' => $file['length']);
+                $size += $file['length'];
+                $path_key = isset($file['path.utf-8']) ? 'path.utf-8' : 'path';
+                $files[] = ['path' => implode('/', $file[$path_key]), 'size' => $file['length']];
             }
-            uasort(
+            usort(
                 $files,
                 function ($a, $b) {
-                    return strnatcasecmp($a['name'], $b['name']);
+                    return strnatcasecmp($a['path'], $b['path']);
                 }
             );
         }
-        return $files;
+        return array('total_size' => $size, 'files' => $files);
     }
 
     public function hasFiles(): bool {
         return isset($this->data['info']['files']);
+    }
+
+    public function hasEncryptedFiles(): bool {
+        return isset($this->data['encrypted_files']);
     }
 
     /**
@@ -465,15 +465,15 @@ class BencodeTorrent {
      */
     public function getGazelleFileList() : array {
         $files = [];
-        foreach ($this->getFileList() as $file) {
-            $name = $file['name'];
+        foreach ($this->getFileList()['files'] as $file) {
+            $path = $file['path'];
             $size = $file['size'];
-            $name = $this->makeUTF8(strtr($name, "\n\r\t", '   '));
-            $ext_pos = strrpos($name, '.');
+            $path = $this->makeUTF8(strtr($path, "\n\r\t", '   '));
+            $ext_pos = strrpos($path, '.');
             // Should not be $ExtPos !== false. Extension-less files that start with a .
             // should not get extensions
-            $ext = ($ext_pos ? trim(substr($name, $ext_pos + 1)) : '');
-            $files[] =  sprintf("%s s%ds %s %s", ".$ext", $size, $name, self::$utf8_filelist_delim);
+            $ext = ($ext_pos ? trim(substr($path, $ext_pos + 1)) : '');
+            $files[] =  sprintf("%s s%ds %s %s", ".$ext", $size, $path, self::$utf8_filelist_delim);
         }
         return $files;
     }
