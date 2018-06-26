@@ -96,7 +96,7 @@ class BencodeTorrent {
             while ($data[$pos] !== 'e') {
                 $key = $this->decode($data, $pos);
                 $value = $this->decode($data, $pos);
-                if (empty($key) || empty($value)) {
+                if (empty($key) || ($value !== 0 and empty($value))) {
                     break;
                 }
                 $return[$key] = $value;
