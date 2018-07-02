@@ -1,6 +1,8 @@
 BEncode Torrent
 ===============
 
+[![Build Status](https://travis-ci.org/ApolloRIP/bencode-torrent.svg?branch=master)](https://travis-ci.org/ApolloRIP/bencode-torrent)
+
 PHP library for encoding and decoding BitTorrent BEncode data, focused around 
 [Gazelle](https://github.com/ApolloRIP/Gazelle).
 
