@@ -2,9 +2,7 @@
 
 namespace ApolloRip\BencodeTorrent;
 
-use PHPUnit\Framework\TestCase;
-
-class BencodeTorrentTest extends TestCase {
+class BencodeTorrentTest extends \PHPUnit\Framework\TestCase {
     public function testLoadTorrent() {
         $bencode = new BencodeTorrent();
         try {
@@ -183,8 +181,9 @@ class BencodeTorrentTest extends TestCase {
             'info' => [
                 'name' => 'test',
                 'length' => 1213134,
-                'pieces' => 'fake pieces string'
-            ]
+                'pieces' => 'fake pieces string',
+            ],
+            'test' => ''
         ];
         $bencode = new BencodeTorrent();
         $bencode->decodeString(

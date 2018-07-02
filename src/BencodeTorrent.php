@@ -24,11 +24,9 @@ namespace ApolloRip\BencodeTorrent;
  * For Gazelle, this also acts as a unification of the two original BEncode implementations
  * which were both used in separate areas of the codebase.
  */
-class BencodeTorrent {
+class BencodeTorrent extends Bencode {
     const FILELIST_DELIM = 0xF7;
     private static $utf8_filelist_delim = null;
-
-    private $data;
 
     public function __construct() {
         $this->setDelim();
@@ -50,8 +48,8 @@ class BencodeTorrent {
      * @param array $data
      * @throws \RuntimeException
      */
-    public function setData(array $data) {
-        $this->data = $data;
+    public function setData($data) {
+        parent::setData($data);
         $this->validate();
     }
 
@@ -61,7 +59,7 @@ class BencodeTorrent {
      * @throws \RuntimeException
      */
     public function decodeString(string $data) {
-        $this->data = $this->decode($data);
+        parent::decodeString($data);
         $this->validate();
     }
 
@@ -72,69 +70,8 @@ class BencodeTorrent {
      * @throws \RuntimeException
      */
     public function decodeFile(string $path) {
-        $this->data = $this->decode(file_get_contents($path, FILE_BINARY));
+        parent::decodeFile($path);
         $this->validate();
-    }
-
-    /**
-     * Decodes a BEncoded string to the following values:
-     * - Dictionary (starts with d, ends with e)
-     * - List (starts with l, ends with e
-     * - Integer (starts with i, ends with e
-     * - String (starts with number denoting number of characters followed by : and then the string)
-     *
-     * @see https://wiki.theory.org/index.php/BitTorrentSpecification
-     *
-     * @param string $data
-     * @param int    $pos
-     * @return array|bool|float|string
-     */
-    private function decode(string $data, int &$pos = 0) {
-        if ($data[$pos] === 'd') {
-            $pos++;
-            $return = [];
-            while ($data[$pos] !== 'e') {
-                $key = $this->decode($data, $pos);
-                $value = $this->decode($data, $pos);
-                if (empty($key) || ($value !== 0 and empty($value))) {
-                    break;
-                }
-                $return[$key] = $value;
-            }
-            ksort($return);
-            $pos++;
-        }
-        elseif ($data[$pos] === 'l') {
-            $pos++;
-            $return = [];
-            while ($data[$pos] !== 'e') {
-                $value = $this->decode($data, $pos);
-                $return[] = $value;
-            }
-            $pos++;
-        }
-        elseif ($data[$pos] === 'i') {
-            $pos++;
-            $digits = strpos($data, 'e', $pos) - $pos;
-            $return = (int) substr($data, $pos, $digits);
-            $pos += $digits + 1;
-        }
-        else {
-            $digits = strpos($data, ':', $pos) - $pos;
-            $len = (int) substr($data, $pos, $digits);
-            $pos += ($digits + 1);
-            $return = substr($data, $pos, $len);
-            $pos += $len;
-        }
-        return $return;
-    }
-
-    /**
-     * Get the internal data array
-     * @return array
-     */
-    public function getData() : array {
-        return $this->data;
     }
 
     /**
@@ -142,6 +79,9 @@ class BencodeTorrent {
      * @throws \RuntimeException
      */
     public function validate() {
+        if (!is_array($this->data)) {
+            throw new \TypeError('Data must be an array');
+        }
         if (empty($this->data['info'])) {
             throw new \RuntimeException("Torrent dictionary doesn't have info key");
         }
@@ -161,63 +101,6 @@ class BencodeTorrent {
                 }
             }
         }
-    }
-
-    /**
-     * @throws \RuntimeException
-     */
-    private function hasData() {
-        if (empty($this->data) || !is_array($this->data)) {
-            throw new \RuntimeException('Must decode proper bencode string first');
-        }
-    }
-
-    /**
-     * @return string
-     */
-    public function getEncode() : string {
-        $this->hasData();
-        return $this->encodeVal($this->data);
-    }
-
-    /**
-     * @param mixed $data
-     * @return string
-     */
-    private function encodeVal($data) : string {
-        if (is_array($data)) {
-            $return = '';
-            $check = -1;
-            $list = true;
-            foreach ($data as $key => $value) {
-                if ($key !== ++$check) {
-                    $list = false;
-                    break;
-                }
-            }
-
-            if ($list) {
-                $return .= 'l';
-                foreach ($data as $value) {
-                    $return .= $this->encodeVal($value);
-                }
-            }
-            else {
-                $return .= 'd';
-                foreach ($data as $key => $value) {
-                    $return .= $this->encodeVal(strval($key));
-                    $return .= $this->encodeVal($value);
-                }
-            }
-            $return .= 'e';
-        }
-        elseif (is_integer($data)) {
-            $return = 'i'.$data.'e';
-        }
-        else {
-            $return = strlen($data) . ':' . $data;
-        }
-        return $return;
     }
 
     /**
