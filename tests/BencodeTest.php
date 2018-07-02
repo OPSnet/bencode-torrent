@@ -40,7 +40,7 @@ class BencodeTest extends \PHPUnit\Framework\TestCase {
      */
     public function testInvalidDictionaryKey() {
         $bencode = new Bencode();
-        $bencode->decodeString('di1e5:value');
+        $bencode->decodeString('di1e5:valuee');
     }
 
     public function invalidIntegers() {
