@@ -2,9 +2,18 @@ BEncode Torrent
 ===============
 
 [![Build Status](https://travis-ci.org/ApolloRIP/bencode-torrent.svg?branch=master)](https://travis-ci.org/ApolloRIP/bencode-torrent)
+[![Packagist](https://img.shields.io/packagist/v/apollorip/bencode-torrent.svg)](https://packagist.org/packages/apollorip/bencode-torrent)
+![PHP from Travis config](https://img.shields.io/travis/php-v/ApolloRIP/bencode-torrent.svg)
 
 PHP library for encoding and decoding BitTorrent BEncode data, focused around 
 [Gazelle](https://github.com/ApolloRIP/Gazelle).
+
+Usage
+-----
+`composer require apollorip/bencode-torrent`
+
+Description
+-----------
 
 BEncode is the encoding used by BitTorrent to store and transmitting loosely structured data. It supports
 * byte strings
