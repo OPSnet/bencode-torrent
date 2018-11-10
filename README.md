@@ -1,7 +1,7 @@
 BEncode Torrent
 ===============
 
-[[![Build Status](https://travis-ci.org/OPSnet/bencode-torrent.svg?branch=master)](https://travis-ci.org/OPSnet/bencode-torrent)
+[![Build Status](https://travis-ci.org/OPSnet/bencode-torrent.svg?branch=master)](https://travis-ci.org/OPSnet/bencode-torrent)
 [![Packagist](https://img.shields.io/packagist/v/orpheusnet/bencode-torrent.svg)](https://packagist.org/packages/orpheusnet/bencode-torrent)
 ![PHP from Travis config](https://img.shields.io/travis/php-v/OPSnet/bencode-torrent.svg)
 
