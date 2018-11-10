@@ -1,6 +1,6 @@
 <?php
 
-namespace ApolloRIP\BencodeTorrent;
+namespace OrpheusNET\BencodeTorrent;
 
 class Bencode {
     protected $data = null;
