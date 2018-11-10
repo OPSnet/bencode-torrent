@@ -1,16 +1,22 @@
 BEncode Torrent
 ===============
 
-[![Build Status](https://travis-ci.org/ApolloRIP/bencode-torrent.svg?branch=master)](https://travis-ci.org/ApolloRIP/bencode-torrent)
-[![Packagist](https://img.shields.io/packagist/v/apollorip/bencode-torrent.svg)](https://packagist.org/packages/apollorip/bencode-torrent)
-![PHP from Travis config](https://img.shields.io/travis/php-v/ApolloRIP/bencode-torrent.svg)
+[[![Build Status](https://travis-ci.org/OPSnet/bencode-torrent.svg?branch=master)](https://travis-ci.org/OPSnet/bencode-torrent)
+[![Packagist](https://img.shields.io/packagist/v/orpheusnet/bencode-torrent.svg)](https://packagist.org/packages/orpheusnet/bencode-torrent)
+![PHP from Travis config](https://img.shields.io/travis/php-v/OPSnet/bencode-torrent.svg)
 
-PHP library for encoding and decoding BitTorrent BEncode data, focused around 
-[Gazelle](https://github.com/ApolloRIP/Gazelle).
+PHP library for encoding and decoding BitTorrent BEncode data, focused around usage within
+[Gazelle](https://github.com/OPSnet/Gazelle).
 
 Usage
 -----
-`composer require apollorip/bencode-torrent`
+`composer require orpheusnet/bencode-torrent`
+
+```php
+use OrpheusNET\BencodeTorrent;
+$bencode = new Bencode();
+$bencode->decodeFile('path/to/file.torrent');
+```
 
 Description
 -----------
@@ -34,7 +40,7 @@ As such, this library will make some checks when loading data that these mandato
 raised. More information on these fields can be found at 
 [BitTorrentSpecification#Metainfo_File_Structure](https://wiki.theory.org/index.php/BitTorrentSpecification#Metainfo_File_Structure).
 
-Finally, this library is primarily aimed at being used within the [Gazelle](https://github.com/ApolloRIP/Gazelle) so
+Finally, this library is primarily aimed at being used within the [Gazelle](https://github.com/OPSnet/Gazelle) so
 we have some utility functions within the library that make sense there to accomplish the following things:
 * Ensuring torrent files are marked as 'private'
 * Setting a 'source' on torrents (to ensure unique info hash)
@@ -43,5 +49,5 @@ we have some utility functions within the library that make sense there to accom
 
 This is based (loosely) off the code in the two separate BEncode libraries within WCD's Gazelle 
 ([bencodetorrent.class.php](https://github.com/WhatCD/Gazelle/blob/master/classes/bencodetorrent.class.php) and 
-[torrent.class.php](https://github.com/WhatCD/Gazelle/blob/master/classes/torrent.class.php)), but without the
-necessary 32bit shims as well as make it a unified library used for both uploading and downloading the torrent files.
+[torrent.class.php](https://github.com/WhatCD/Gazelle/blob/master/classes/torrent.class.php)), but without the now
+unnecessary 32bit shims as well as making it a unified library used for both uploading and downloading the torrent files.
