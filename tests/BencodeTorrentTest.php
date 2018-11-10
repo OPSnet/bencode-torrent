@@ -1,6 +1,6 @@
 <?php
 
-namespace ApolloRip\BencodeTorrent;
+namespace ApolloRIP\BencodeTorrent;
 
 class BencodeTorrentTest extends \PHPUnit\Framework\TestCase {
     public function testLoadTorrent() {

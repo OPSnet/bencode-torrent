@@ -1,6 +1,6 @@
 <?php
 
-namespace ApolloRip\BencodeTorrent;
+namespace ApolloRIP\BencodeTorrent;
 
 /**
  * BEncode service that allows us to encode PHP objects into BEncode and decode
