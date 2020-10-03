@@ -1,9 +1,9 @@
 BEncode Torrent
 ===============
 
-[![Build Status](https://travis-ci.org/OPSnet/bencode-torrent.svg?branch=master)](https://travis-ci.org/OPSnet/bencode-torrent)
+[![Test](https://github.com/OPSnet/bencode-torrent/workflows/Test/badge.svg?branch=master&event=push)](https://github.com/OPSnet/bencode-torrent/actions?query=workflow%3ATest+branch%3Amaster+event%3Apush)
 [![Packagist](https://img.shields.io/packagist/v/orpheusnet/bencode-torrent.svg)](https://packagist.org/packages/orpheusnet/bencode-torrent)
-![PHP from Travis config](https://img.shields.io/travis/php-v/OPSnet/bencode-torrent.svg)
+![Packagist PHP Version Support](https://img.shields.io/packagist/php-v/orpheusnet/bencode-torrent)
 
 PHP library for encoding and decoding BitTorrent BEncode data, focused around usage within
 [Gazelle](https://github.com/OPSnet/Gazelle).
