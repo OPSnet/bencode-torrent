@@ -2,8 +2,10 @@
 
 namespace OrpheusNET\BencodeTorrent;
 
-class BencodeTest extends \PHPUnit\Framework\TestCase {
-    public function dataProvider() {
+class BencodeTest extends \PHPUnit\Framework\TestCase
+{
+    public function dataProvider()
+    {
         return [
             ['i0e', 0],
             ['i-1e', -1],
@@ -21,27 +23,31 @@ class BencodeTest extends \PHPUnit\Framework\TestCase {
      * @param string $bencoded_string
      * @param mixed  $expected
      */
-    public function testDecodeEncode($bencoded_string, $expected) {
+    public function testDecodeEncode($bencoded_string, $expected)
+    {
         $bencode = new Bencode();
         $bencode->decodeString($bencoded_string);
         $this->assertEquals($expected, $bencode->getData());
         $this->assertEquals($bencoded_string, $bencode->getEncode());
     }
 
-    public function testEmptyDict() {
+    public function testEmptyDict()
+    {
         $bencode = new Bencode();
         $bencode->decodeString('de');
         $this->assertEquals([], $bencode->getData());
         $this->assertEquals('le', $bencode->getEncode());
     }
 
-    public function testInvalidDictionaryKey() {
+    public function testInvalidDictionaryKey()
+    {
         $bencode = new Bencode();
         $this->expectException(\RuntimeException::class);
         $bencode->decodeString('di1e5:valuee');
     }
 
-    public function invalidIntegers() {
+    public function invalidIntegers()
+    {
         return [['-0'], ['a'], ['1.0']];
     }
 
@@ -49,13 +55,15 @@ class BencodeTest extends \PHPUnit\Framework\TestCase {
      * @param string $value
      * @dataProvider invalidIntegers
      */
-    public function testInvalidInteger(string $value) {
+    public function testInvalidInteger(string $value)
+    {
         $bencode = new Bencode();
         $this->expectException(\RuntimeException::class);
         $bencode->decodeString("i{$value}e");
     }
 
-    public function testInvalidString() {
+    public function testInvalidString()
+    {
         $bencode = new Bencode();
         $this->expectException(\RuntimeException::class);
         $bencode->decodeString('i1e0e');

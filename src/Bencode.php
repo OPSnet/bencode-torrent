@@ -2,7 +2,8 @@
 
 namespace OrpheusNET\BencodeTorrent;
 
-class Bencode {
+class Bencode
+{
     protected $data = null;
 
     /**
@@ -10,7 +11,8 @@ class Bencode {
      * @param mixed $data
      * @throws \RuntimeException
      */
-    public function setData($data) {
+    public function setData($data)
+    {
         $this->data = $data;
     }
 
@@ -19,7 +21,8 @@ class Bencode {
      * @param string $data
      * @throws \RuntimeException
      */
-    public function decodeString(string $data) {
+    public function decodeString(string $data)
+    {
         $this->data = $this->decode($data);
     }
 
@@ -29,7 +32,8 @@ class Bencode {
      * @param string $path
      * @throws \RuntimeException
      */
-    public function decodeFile(string $path) {
+    public function decodeFile(string $path)
+    {
         $this->data = $this->decode(file_get_contents($path, FILE_BINARY));
     }
 
@@ -46,7 +50,8 @@ class Bencode {
      * @param int    $pos
      * @return mixed
      */
-    protected function decode(string $data, int &$pos = 0) {
+    protected function decode(string $data, int &$pos = 0)
+    {
         $start_decode = $pos === 0;
         if ($data[$pos] === 'd') {
             $pos++;
@@ -58,14 +63,13 @@ class Bencode {
                     break;
                 }
                 if (!is_string($key)) {
-                    throw new \RuntimeException('Invalid key type, must be string: '.gettype($key));
+                    throw new \RuntimeException('Invalid key type, must be string: ' . gettype($key));
                 }
                 $return[$key] = $value;
             }
             ksort($return);
             $pos++;
-        }
-        elseif ($data[$pos] === 'l') {
+        } elseif ($data[$pos] === 'l') {
             $pos++;
             $return = [];
             while ($data[$pos] !== 'e') {
@@ -73,8 +77,7 @@ class Bencode {
                 $return[] = $value;
             }
             $pos++;
-        }
-        elseif ($data[$pos] === 'i') {
+        } elseif ($data[$pos] === 'i') {
             $pos++;
             $digits = strpos($data, 'e', $pos) - $pos;
             $return = substr($data, $pos, $digits);
@@ -87,13 +90,12 @@ class Bencode {
                 $return = substr($return, 1);
             }
             if (!ctype_digit($return)) {
-                $msg = 'Cannot have non-digit values in integer number: '.$return;
+                $msg = 'Cannot have non-digit values in integer number: ' . $return;
                 throw new \RuntimeException($msg);
             }
             $return = $multiplier * ((int) $return);
             $pos += $digits + 1;
-        }
-        else {
+        } else {
             $digits = strpos($data, ':', $pos) - $pos;
             $len = (int) substr($data, $pos, $digits);
             $pos += ($digits + 1);
@@ -112,14 +114,16 @@ class Bencode {
      * Get the internal data array
      * @return mixed
      */
-    public function getData() {
+    public function getData()
+    {
         return $this->data;
     }
 
     /**
      * @throws \RuntimeException
      */
-    protected function hasData() {
+    protected function hasData()
+    {
         if ($this->data === null) {
             throw new \RuntimeException('Must decode proper bencode string first');
         }
@@ -128,7 +132,8 @@ class Bencode {
     /**
      * @return string
      */
-    public function getEncode() : string {
+    public function getEncode(): string
+    {
         $this->hasData();
         return $this->encodeVal($this->data);
     }
@@ -137,7 +142,8 @@ class Bencode {
      * @param mixed $data
      * @return string
      */
-    protected function encodeVal($data) : string {
+    protected function encodeVal($data): string
+    {
         if (is_array($data)) {
             $return = '';
             $check = -1;
@@ -154,8 +160,7 @@ class Bencode {
                 foreach ($data as $value) {
                     $return .= $this->encodeVal($value);
                 }
-            }
-            else {
+            } else {
                 $return .= 'd';
                 foreach ($data as $key => $value) {
                     $return .= $this->encodeVal(strval($key));
@@ -163,11 +168,9 @@ class Bencode {
                 }
             }
             $return .= 'e';
-        }
-        elseif (is_integer($data)) {
-            $return = 'i'.$data.'e';
-        }
-        else {
+        } elseif (is_integer($data)) {
+            $return = 'i' . $data . 'e';
+        } else {
             $return = strlen($data) . ':' . $data;
         }
         return $return;

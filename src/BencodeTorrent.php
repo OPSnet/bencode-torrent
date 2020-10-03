@@ -24,11 +24,13 @@ namespace OrpheusNET\BencodeTorrent;
  * For Gazelle, this also acts as a unification of the two original BEncode implementations
  * which were both used in separate areas of the codebase.
  */
-class BencodeTorrent extends Bencode {
-    const FILELIST_DELIM = 0xF7;
+class BencodeTorrent extends Bencode
+{
+    public const FILELIST_DELIM = 0xF7;
     private static $utf8_filelist_delim = null;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->setDelim();
     }
 
@@ -37,7 +39,8 @@ class BencodeTorrent extends Bencode {
      * and char to set a class constant or variable, so we wait till the class is initialized
      * for the first time to set it.
      */
-    private function setDelim() {
+    private function setDelim()
+    {
         if (self::$utf8_filelist_delim === null) {
             self::$utf8_filelist_delim = utf8_encode(chr(self::FILELIST_DELIM));
         }
@@ -48,7 +51,8 @@ class BencodeTorrent extends Bencode {
      * @param array $data
      * @throws \RuntimeException
      */
-    public function setData($data) {
+    public function setData($data)
+    {
         parent::setData($data);
         $this->validate();
     }
@@ -58,7 +62,8 @@ class BencodeTorrent extends Bencode {
      * @param string $data
      * @throws \RuntimeException
      */
-    public function decodeString(string $data) {
+    public function decodeString(string $data)
+    {
         parent::decodeString($data);
         $this->validate();
     }
@@ -69,7 +74,8 @@ class BencodeTorrent extends Bencode {
      * @param string $path
      * @throws \RuntimeException
      */
-    public function decodeFile(string $path) {
+    public function decodeFile(string $path)
+    {
         parent::decodeFile($path);
         $this->validate();
     }
@@ -78,7 +84,8 @@ class BencodeTorrent extends Bencode {
      * Validates that the internal data array
      * @throws \RuntimeException
      */
-    public function validate() {
+    public function validate()
+    {
         if (!is_array($this->data)) {
             throw new \TypeError('Data must be an array');
         }
@@ -111,7 +118,8 @@ class BencodeTorrent extends Bencode {
      *
      * @return bool flag to indicate if we altered the info dictionary
      */
-    public function clean() : bool {
+    public function clean(): bool
+    {
         $this->cleanDataDictionary();
         return $this->cleanInfoDictionary();
     }
@@ -121,7 +129,8 @@ class BencodeTorrent extends Bencode {
      * overwritten dynamically on any downloaded torrent (like announce or comment), so that we
      * store the smallest encoded string within the database and cuts down on potential waste.
      */
-    public function cleanDataDictionary() {
+    public function cleanDataDictionary()
+    {
         $allowed_keys = array('encoding', 'info');
         foreach ($this->data as $key => $value) {
             if (!in_array($key, $allowed_keys)) {
@@ -144,7 +153,8 @@ class BencodeTorrent extends Bencode {
      *
      * @return bool
      */
-    public function cleanInfoDictionary() : bool {
+    public function cleanInfoDictionary(): bool
+    {
         $cleaned = false;
         $allowed_keys = array('files', 'name', 'piece length', 'pieces', 'private', 'length',
                               'name.utf8', 'name.utf-8', 'md5sum', 'sha1', 'source',
@@ -164,7 +174,8 @@ class BencodeTorrent extends Bencode {
      *
      * @return bool
      */
-    public function isPrivate() : bool {
+    public function isPrivate(): bool
+    {
         $this->hasData();
         return isset($this->data['info']['private']) && $this->data['info']['private'] === 1;
     }
@@ -178,7 +189,8 @@ class BencodeTorrent extends Bencode {
      *
      * @return bool
      */
-    public function makePrivate() : bool {
+    public function makePrivate(): bool
+    {
         $this->hasData();
         if ($this->isPrivate()) {
             return false;
@@ -199,7 +211,8 @@ class BencodeTorrent extends Bencode {
      *
      * @return bool true if the source was set/changed, false if no change
      */
-    public function setSource(string $source) : bool {
+    public function setSource(string $source): bool
+    {
         $this->hasData();
         if (isset($this->data['info']['source']) && $this->data['info']['source'] === $source) {
             return false;
@@ -212,7 +225,8 @@ class BencodeTorrent extends Bencode {
         return true;
     }
 
-    public function getSource(): ?string {
+    public function getSource(): ?string
+    {
         $this->hasData();
         return $this->data['info']['source'] ?? null;
     }
@@ -225,7 +239,8 @@ class BencodeTorrent extends Bencode {
      *
      * @param array $array
      */
-    public function setValue(array $array) {
+    public function setValue(array $array)
+    {
         foreach ($array as $key => $value) {
             if (is_array($value)) {
                 ksort($value);
@@ -258,19 +273,22 @@ class BencodeTorrent extends Bencode {
      *
      * @return string
      */
-    public function getInfoHash() : string {
+    public function getInfoHash(): string
+    {
         $this->hasData();
         return sha1($this->encodeVal($this->data['info']));
     }
 
-    public function getHexInfoHash(): string {
+    public function getHexInfoHash(): string
+    {
         return pack('H*', $this->getInfoHash());
     }
 
     /**
      * @return string
      */
-    public function getName() {
+    public function getName()
+    {
         if (isset($this->data['info']['name.utf-8'])) {
             return $this->data['info']['name.utf-8'];
         }
@@ -284,12 +302,12 @@ class BencodeTorrent extends Bencode {
      *
      * @return int
      */
-    public function getSize() : int {
+    public function getSize(): int
+    {
         $cur_size = 0;
         if (!isset($this->data['info']['files'])) {
             $cur_size = $this->data['info']['length'];
-        }
-        else {
+        } else {
             foreach ($this->data['info']['files'] as $file) {
                 $cur_size += $file['length'];
             }
@@ -306,7 +324,8 @@ class BencodeTorrent extends Bencode {
      *
      * @return array
      */
-    public function getFileList() : array {
+    public function getFileList(): array
+    {
         $files = [];
         if (!isset($this->data['info']['files'])) {
             // Single-file torrent
@@ -315,8 +334,7 @@ class BencodeTorrent extends Bencode {
                 $this->data['info']['name']);
             $size = $this->data['info']['length'];
             $files[] = ['path' => $name, 'size' => $size];
-        }
-        else {
+        } else {
             $size = 0;
             foreach ($this->data['info']['files'] as $file) {
                 $size += $file['length'];
@@ -333,11 +351,13 @@ class BencodeTorrent extends Bencode {
         return array('total_size' => $size, 'files' => $files);
     }
 
-    public function hasFiles(): bool {
+    public function hasFiles(): bool
+    {
         return isset($this->data['info']['files']);
     }
 
-    public function hasEncryptedFiles(): bool {
+    public function hasEncryptedFiles(): bool
+    {
         return isset($this->data['encrypted_files']);
     }
 
@@ -351,7 +371,8 @@ class BencodeTorrent extends Bencode {
      *
      * @return array
      */
-    public function getGazelleFileList() : array {
+    public function getGazelleFileList(): array
+    {
         $files = [];
         foreach ($this->getFileList()['files'] as $file) {
             $path = $file['path'];
@@ -373,7 +394,8 @@ class BencodeTorrent extends Bencode {
      *
      * @return string
      */
-    private function makeUTF8(string $str) : string {
+    private function makeUTF8(string $str): string
+    {
         if (preg_match('//u', $str)) {
             $encoding = 'UTF-8';
         }
@@ -388,8 +410,7 @@ class BencodeTorrent extends Bencode {
         // @codeCoverageIgnoreEnd
         if ($encoding === 'UTF-8') {
             return $str;
-        }
-        else {
+        } else {
             return @mb_convert_encoding($str, 'UTF-8', $encoding);
         }
     }
