@@ -272,9 +272,11 @@ class BencodeTorrentTest extends \PHPUnit\Framework\TestCase {
         ];
         $bencode = new BencodeTorrent();
         $bencode->setData($data);
+        $this->assertNull($bencode->getSource());
         $this->assertTrue($bencode->setSource('APL'));
         $actual = $bencode->getData();
-        $this->assertEquals('APL', $actual['info']['source']);
+        $this->assertSame('APL', $bencode->getSource());
+        $this->assertFalse($bencode->setSource('APL'));
         $this->assertNotContains('unique', $actual['info']);
         $this->assertNotContains('x_cross_seed', $actual['info']);
     }

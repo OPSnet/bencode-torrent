@@ -212,6 +212,11 @@ class BencodeTorrent extends Bencode {
         return true;
     }
 
+    public function getSource(): ?string {
+        $this->hasData();
+        return $this->data['info']['source'] ?? null;
+    }
+
     /**
      * Function to allow you set any number of keys and values in the data dictionary. You can
      * set the value in a dictionary by concatenating the keys into a string with a period
