@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace OrpheusNET\BencodeTorrent;
 
 class BencodeTorrentTest extends \PHPUnit\Framework\TestCase
