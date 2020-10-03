@@ -144,6 +144,7 @@ class BencodeTorrentTest extends \PHPUnit\Framework\TestCase
             ]
         ];
         $this->assertEquals($file_list, $bencode->getFileList());
+        $this->assertSame(1425699508, $bencode->getCreationDate());
     }
 
     public function testSetData(): void

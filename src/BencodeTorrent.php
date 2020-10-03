@@ -209,10 +209,6 @@ class BencodeTorrent extends Bencode
      * 'official' flag (no accepted BEP on it), but it has become the defacto standard with more
      * clients supporting it natively. Returns a boolean on whether or not the source was changed
      * so that an appropriate screen can be shown to the user.
-     *
-     * @param string $source
-     *
-     * @return bool true if the source was set/changed, false if no change
      */
     public function setSource(string $source): bool
     {
@@ -228,6 +224,9 @@ class BencodeTorrent extends Bencode
         return true;
     }
 
+    /**
+     * Get the source flag if one has been set
+     */
     public function getSource(): ?string
     {
         $this->hasData();
@@ -235,12 +234,19 @@ class BencodeTorrent extends Bencode
     }
 
     /**
+     * Get the creation date for torrent if one has been set
+     */
+    public function getCreationDate(): ?int
+    {
+        $this->hasData();
+        return $this->data['creation date'] ?? null;
+    }
+
+    /**
      * Function to allow you set any number of keys and values in the data dictionary. You can
      * set the value in a dictionary by concatenating the keys into a string with a period
      * separator (ex: info.name will set name field in the info dictionary) so that the rest
      * of the dictionary is unaffected.
-     *
-     * @param array $array
      */
     public function setValue(array $array): void
     {
