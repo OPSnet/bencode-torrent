@@ -418,18 +418,13 @@ class BencodeTorrentTest extends \PHPUnit\Framework\TestCase {
         $this->assertFalse($bencode->hasFiles());
     }
 
-    /**
-     * @expectedException \RuntimeException
-     */
     public function testInvalidSet() {
         $data = ['encoding' => 'UTF8', 'announce' => 'http://localhost:8080/announce'];
         $bencode = new BencodeTorrent();
+        $this->expectException(\RuntimeException::class);
         $bencode->setData($data);
     }
 
-    /**
-     * @expectedException \RuntimeException
-     */
     public function testInvalidSetValue() {
         $data = [
             'encoding' => 'UTF8',
@@ -442,20 +437,16 @@ class BencodeTorrentTest extends \PHPUnit\Framework\TestCase {
 
         $bencode = new BencodeTorrent();
         $bencode->setData($data);
+        $this->expectException(\RuntimeException::class);
         $bencode->setValue(['info' => []]);
     }
 
-    /**
-     * @expectedException \RuntimeException
-     */
     public function testGetEncodeNoData() {
         $bencode = new BencodeTorrent();
+        $this->expectException(\RuntimeException::class);
         $bencode->getEncode();
     }
 
-    /**
-     * @expectedException \RuntimeException
-     */
     public function testInvalidPath() {
         $data = [
             'encoding' => 'UTF8',
@@ -472,6 +463,7 @@ class BencodeTorrentTest extends \PHPUnit\Framework\TestCase {
             ]
         ];
         $bencode = new BencodeTorrent();
+        $this->expectException(\RuntimeException::class);
         $bencode->setData($data);
     }
 }

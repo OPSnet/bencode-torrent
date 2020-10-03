@@ -35,11 +35,9 @@ class BencodeTest extends \PHPUnit\Framework\TestCase {
         $this->assertEquals('le', $bencode->getEncode());
     }
 
-    /**
-     * @expectedException \RuntimeException
-     */
     public function testInvalidDictionaryKey() {
         $bencode = new Bencode();
+        $this->expectException(\RuntimeException::class);
         $bencode->decodeString('di1e5:valuee');
     }
 
@@ -50,18 +48,16 @@ class BencodeTest extends \PHPUnit\Framework\TestCase {
     /**
      * @param string $value
      * @dataProvider invalidIntegers
-     * @expectedException \RuntimeException
      */
     public function testInvalidInteger(string $value) {
         $bencode = new Bencode();
+        $this->expectException(\RuntimeException::class);
         $bencode->decodeString("i{$value}e");
     }
 
-    /**
-     * @expectedException \RuntimeException
-     */
     public function testInvalidString() {
         $bencode = new Bencode();
+        $this->expectException(\RuntimeException::class);
         $bencode->decodeString('i1e0e');
     }
 }
