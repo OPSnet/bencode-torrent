@@ -29,6 +29,7 @@ namespace OrpheusNET\BencodeTorrent;
 class BencodeTorrent extends Bencode
 {
     public const FILELIST_DELIM = 0xF7;
+    /** @var string */
     private static $utf8_filelist_delim = null;
 
     public function __construct()
@@ -41,7 +42,7 @@ class BencodeTorrent extends Bencode
      * and char to set a class constant or variable, so we wait till the class is initialized
      * for the first time to set it.
      */
-    private function setDelim()
+    private function setDelim(): void
     {
         if (self::$utf8_filelist_delim === null) {
             self::$utf8_filelist_delim = utf8_encode(chr(self::FILELIST_DELIM));
@@ -53,7 +54,7 @@ class BencodeTorrent extends Bencode
      * @param array $data
      * @throws \RuntimeException
      */
-    public function setData($data)
+    public function setData($data): void
     {
         parent::setData($data);
         $this->validate();
@@ -64,7 +65,7 @@ class BencodeTorrent extends Bencode
      * @param string $data
      * @throws \RuntimeException
      */
-    public function decodeString(string $data)
+    public function decodeString(string $data): void
     {
         parent::decodeString($data);
         $this->validate();
@@ -76,7 +77,7 @@ class BencodeTorrent extends Bencode
      * @param string $path
      * @throws \RuntimeException
      */
-    public function decodeFile(string $path)
+    public function decodeFile(string $path): void
     {
         parent::decodeFile($path);
         $this->validate();
@@ -84,9 +85,9 @@ class BencodeTorrent extends Bencode
 
     /**
      * Validates that the internal data array
-     * @throws \RuntimeException
+     * @throws \TypeError|\RuntimeException
      */
-    public function validate()
+    public function validate(): void
     {
         if (!is_array($this->data)) {
             throw new \TypeError('Data must be an array');
@@ -131,7 +132,7 @@ class BencodeTorrent extends Bencode
      * overwritten dynamically on any downloaded torrent (like announce or comment), so that we
      * store the smallest encoded string within the database and cuts down on potential waste.
      */
-    public function cleanDataDictionary()
+    public function cleanDataDictionary(): void
     {
         $allowed_keys = array('encoding', 'info');
         foreach ($this->data as $key => $value) {
@@ -241,7 +242,7 @@ class BencodeTorrent extends Bencode
      *
      * @param array $array
      */
-    public function setValue(array $array)
+    public function setValue(array $array): void
     {
         foreach ($array as $key => $value) {
             if (is_array($value)) {
@@ -286,11 +287,9 @@ class BencodeTorrent extends Bencode
         return pack('H*', $this->getInfoHash());
     }
 
-    /**
-     * @return string
-     */
-    public function getName()
+    public function getName(): string
     {
+        $this->hasData();
         if (isset($this->data['info']['name.utf-8'])) {
             return $this->data['info']['name.utf-8'];
         }
@@ -301,11 +300,10 @@ class BencodeTorrent extends Bencode
      * Get the total size in bytes of the files in the torrent. For a single file torrent, it'll
      * just be the 'length' key in the 'info' dictionary, else we iterate through the 'files' list
      * and add up the 'length' of each element.
-     *
-     * @return int
      */
     public function getSize(): int
     {
+        $this->hasData();
         $cur_size = 0;
         if (!isset($this->data['info']['files'])) {
             $cur_size = $this->data['info']['length'];

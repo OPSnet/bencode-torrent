@@ -6,7 +6,7 @@ namespace OrpheusNET\BencodeTorrent;
 
 class BencodeTorrentTest extends \PHPUnit\Framework\TestCase
 {
-    public function testLoadTorrent()
+    public function testLoadTorrent(): void
     {
         $bencode = new BencodeTorrent();
         try {
@@ -146,7 +146,7 @@ class BencodeTorrentTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($file_list, $bencode->getFileList());
     }
 
-    public function testSetData()
+    public function testSetData(): void
     {
         $data = [
             'encoding' => 'UTF8',
@@ -179,7 +179,7 @@ class BencodeTorrentTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testEmptyDictionary()
+    public function testEmptyDictionary(): void
     {
         $expected = [
             'encoding' => 'UTF8',
@@ -198,7 +198,7 @@ class BencodeTorrentTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $bencode->getData());
     }
 
-    public function testClean()
+    public function testClean(): void
     {
         $data = [
             'encoding' => 'UTF8',
@@ -232,7 +232,7 @@ class BencodeTorrentTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($data, $bencode->getData());
     }
 
-    public function testSetPrivate()
+    public function testSetPrivate(): void
     {
         $data = [
             'encoding' => 'UTF8',
@@ -253,7 +253,7 @@ class BencodeTorrentTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(1, $actual['info']['private']);
     }
 
-    public function testSetAlreadyPrivate()
+    public function testSetAlreadyPrivate(): void
     {
         $data = [
             'encoding' => 'UTF8',
@@ -268,7 +268,7 @@ class BencodeTorrentTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($bencode->makePrivate());
     }
 
-    public function testSetSource()
+    public function testSetSource(): void
     {
         $data = [
             'encoding' => 'UTF8',
@@ -290,7 +290,7 @@ class BencodeTorrentTest extends \PHPUnit\Framework\TestCase
         $this->assertNotContains('x_cross_seed', $actual['info']);
     }
 
-    public function testSetAlreadySourced()
+    public function testSetAlreadySourced(): void
     {
         $data = [
             'encoding' => 'UTF8',
@@ -309,7 +309,7 @@ class BencodeTorrentTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($data, $bencode->getData());
     }
 
-    public function testSetDifferentSource()
+    public function testSetDifferentSource(): void
     {
         $data = [
             'encoding' => 'UTF8',
@@ -330,7 +330,7 @@ class BencodeTorrentTest extends \PHPUnit\Framework\TestCase
         $this->assertNotContains('x_cross_seed', $actual['info']);
     }
 
-    public function testSetValue()
+    public function testSetValue(): void
     {
         $data = [
             'encoding' => 'UTF8',
@@ -388,7 +388,7 @@ class BencodeTorrentTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($bencode->hasFiles());
     }
 
-    public function testGetUtf8Name()
+    public function testGetUtf8Name(): void
     {
         $data = [
             'encoding' => 'UTF8',
@@ -418,7 +418,7 @@ class BencodeTorrentTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(['. s12345s test!! ÷'], $bencode->getGazelleFileList());
     }
 
-    public function testIso88591Name()
+    public function testIso88591Name(): void
     {
         $data = [
             'info' => [
@@ -432,7 +432,7 @@ class BencodeTorrentTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($bencode->hasFiles());
     }
 
-    public function testInvalidSet()
+    public function testInvalidSet(): void
     {
         $data = ['encoding' => 'UTF8', 'announce' => 'http://localhost:8080/announce'];
         $bencode = new BencodeTorrent();
@@ -440,7 +440,7 @@ class BencodeTorrentTest extends \PHPUnit\Framework\TestCase
         $bencode->setData($data);
     }
 
-    public function testInvalidSetValue()
+    public function testInvalidSetValue(): void
     {
         $data = [
             'encoding' => 'UTF8',
@@ -457,14 +457,14 @@ class BencodeTorrentTest extends \PHPUnit\Framework\TestCase
         $bencode->setValue(['info' => []]);
     }
 
-    public function testGetEncodeNoData()
+    public function testGetEncodeNoData(): void
     {
         $bencode = new BencodeTorrent();
         $this->expectException(\RuntimeException::class);
         $bencode->getEncode();
     }
 
-    public function testInvalidPath()
+    public function testInvalidPath(): void
     {
         $data = [
             'encoding' => 'UTF8',

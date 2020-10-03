@@ -6,12 +6,12 @@ namespace OrpheusNET\BencodeTorrent;
 
 class Bencode
 {
-    protected $data = null;
+    /** @var array */
+    protected $data;
 
     /**
      * Sets the internal data array
      * @param mixed $data
-     * @throws \RuntimeException
      */
     public function setData($data)
     {
@@ -36,7 +36,7 @@ class Bencode
      */
     public function decodeFile(string $path)
     {
-        $this->data = $this->decode(file_get_contents($path, FILE_BINARY));
+        $this->data = $this->decode(file_get_contents($path));
     }
 
     /**

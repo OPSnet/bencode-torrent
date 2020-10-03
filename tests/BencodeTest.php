@@ -6,7 +6,7 @@ namespace OrpheusNET\BencodeTorrent;
 
 class BencodeTest extends \PHPUnit\Framework\TestCase
 {
-    public function dataProvider()
+    public function dataProvider(): array
     {
         return [
             ['i0e', 0],
@@ -22,10 +22,9 @@ class BencodeTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider dataProvider
-     * @param string $bencoded_string
      * @param mixed  $expected
      */
-    public function testDecodeEncode($bencoded_string, $expected)
+    public function testDecodeEncode(string $bencoded_string, $expected): void
     {
         $bencode = new Bencode();
         $bencode->decodeString($bencoded_string);
@@ -33,7 +32,7 @@ class BencodeTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($bencoded_string, $bencode->getEncode());
     }
 
-    public function testEmptyDict()
+    public function testEmptyDict(): void
     {
         $bencode = new Bencode();
         $bencode->decodeString('de');
@@ -41,14 +40,14 @@ class BencodeTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('le', $bencode->getEncode());
     }
 
-    public function testInvalidDictionaryKey()
+    public function testInvalidDictionaryKey(): void
     {
         $bencode = new Bencode();
         $this->expectException(\RuntimeException::class);
         $bencode->decodeString('di1e5:valuee');
     }
 
-    public function invalidIntegers()
+    public function invalidIntegers(): array
     {
         return [['-0'], ['a'], ['1.0']];
     }
@@ -57,14 +56,14 @@ class BencodeTest extends \PHPUnit\Framework\TestCase
      * @param string $value
      * @dataProvider invalidIntegers
      */
-    public function testInvalidInteger(string $value)
+    public function testInvalidInteger(string $value): void
     {
         $bencode = new Bencode();
         $this->expectException(\RuntimeException::class);
         $bencode->decodeString("i{$value}e");
     }
 
-    public function testInvalidString()
+    public function testInvalidString(): void
     {
         $bencode = new Bencode();
         $this->expectException(\RuntimeException::class);
