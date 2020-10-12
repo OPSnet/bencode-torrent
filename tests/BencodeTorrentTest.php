@@ -465,7 +465,7 @@ class BencodeTorrentTest extends \PHPUnit\Framework\TestCase
         $bencode->getEncode();
     }
 
-    public function testInvalidPath(): void
+    public function testEmptyPathPart(): void
     {
         $data = [
             'encoding' => 'UTF8',
@@ -473,7 +473,44 @@ class BencodeTorrentTest extends \PHPUnit\Framework\TestCase
                 'files' => [
                     0 => [
                         'length' => 1234,
-                        'path' => ['']
+                        'path' => [
+                            '',
+                            '01 - test test',
+                        ]
+                    ]
+                ],
+                'name' => 'test',
+                'length' => 1213134,
+                'pieces' => 'fake pieces string'
+            ]
+        ];
+        $bencode = new BencodeTorrent();
+        $bencode->setData($data);
+        $this->assertSame(
+            [
+                'total_size' => 1234,
+                'files' => [
+                    0 => [
+                        'path' => '/01 - test test',
+                        'size' => 1234,
+                    ],
+                ],
+            ],
+            $bencode->getFileList()
+        );
+    }
+
+    public function testEmptyPath(): void
+    {
+        $data = [
+            'encoding' => 'UTF8',
+            'info' => [
+                'files' => [
+                    0 => [
+                        'length' => 1234,
+                        'path' => [
+                            '',
+                        ]
                     ]
                 ],
                 'name' => 'test',

@@ -105,8 +105,8 @@ class BencodeTorrent extends Bencode
                             return strlen($element) === 0;
                         }
                     );
-                    if (count($filter) > 0) {
-                        throw new \RuntimeException('Cannot have empty path for a file');
+                    if (count($filter) === count($file[$path_key]) && $file['length'] !== 0) {
+                        throw new \RuntimeException('Cannot have a file with no path');
                     }
                 }
             }
