@@ -45,7 +45,7 @@ class BencodeTorrent extends Bencode
     private function setDelim(): void
     {
         if (self::$utf8_filelist_delim === null) {
-            self::$utf8_filelist_delim = utf8_encode(chr(self::FILELIST_DELIM));
+            self::$utf8_filelist_delim = mb_convert_encoding(chr(self::FILELIST_DELIM), 'UTF-8', 'ISO-8859-1');
         }
     }
 
