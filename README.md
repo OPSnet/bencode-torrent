@@ -1,7 +1,7 @@
 BEncode Torrent
 ===============
 
-[![Test](https://github.com/OPSnet/bencode-torrent/workflows/Test/badge.svg?branch=master&event=push)](https://github.com/OPSnet/bencode-torrent/actions?query=workflow%3ATest+branch%3Amaster+event%3Apush)
+[![Test](https://github.com/OPSnet/bencode-torrent/actions/workflows/test.yml/badge.svg?branch=master&event=push)](https://github.com/OPSnet/bencode-torrent/actions/workflows/test.yml)
 [![Packagist](https://img.shields.io/packagist/v/orpheusnet/bencode-torrent.svg)](https://packagist.org/packages/orpheusnet/bencode-torrent)
 ![Packagist PHP Version Support](https://img.shields.io/packagist/php-v/orpheusnet/bencode-torrent)
 
@@ -21,13 +21,14 @@ $bencode->decodeFile('path/to/file.torrent');
 Description
 -----------
 
-BEncode is the encoding used by BitTorrent to store and transmitting loosely structured data. It supports
+BEncode is the encoding used by BitTorrent to store and transmitting loosely structured data. It supports:
+
 * byte strings
 * integers
 * lists
 * dictionaries (associative arrays, where keys are sorted alphabetically)
 
-You can see more information about how these types are supported at 
+You can see more information about how these types are supported at
 [BitTorrentSpecification#Bencoding](https://wiki.theory.org/index.php/BitTorrentSpecification#Bencoding).
 
 In addition to the above, torrent files are expected to be BEncoded dictionaries that contain minimally the keys
@@ -42,6 +43,7 @@ raised. More information on these fields can be found at
 
 Finally, this library is primarily aimed at being used within the [Gazelle](https://github.com/OPSnet/Gazelle) so
 we have some utility functions within the library that make sense there to accomplish the following things:
+
 * Ensuring torrent files are marked as 'private'
 * Setting a 'source' on torrents (to ensure unique info hash)
 * Cleaning out unnecessary fields that also reveal stuff about a user (like __announce list__ and __created by__)
