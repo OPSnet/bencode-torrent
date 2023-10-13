@@ -522,4 +522,11 @@ class BencodeTorrentTest extends \PHPUnit\Framework\TestCase
         $this->expectException(\RuntimeException::class);
         $bencode->setData($data);
     }
+
+    public function testValidateEmptyData(): void
+    {
+        $bencode = new BencodeTorrent();
+        $this->expectException(\TypeError::class);
+        $bencode->validate();
+    }
 }
