@@ -1,19 +1,20 @@
-<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/6.5/phpunit.xsd"
-         colors="true"
-         bootstrap="vendor/autoload.php">
-	<testsuites>
-		<testsuite name="unit">
-			<directory>tests</directory>
-		</testsuite>
-	</testsuites>
-	<filter>
-		<whitelist processUncoveredFilesFromWhitelist="true">
-			<directory suffix=".php">src</directory>
-			<exclude />
-		</whitelist>
-	</filter>
-	<logging>
-		<log type="coverage-html" target="report" />
-	</logging>
+<?xml version="1.0"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.4/phpunit.xsd" colors="true" bootstrap="vendor/autoload.php" cacheDirectory=".phpunit.cache">
+  <coverage>
+    <report>
+      <html outputDirectory="report"/>
+    </report>
+  </coverage>
+  <testsuites>
+    <testsuite name="unit">
+      <directory>tests</directory>
+    </testsuite>
+  </testsuites>
+  <logging/>
+  <source>
+    <include>
+      <directory suffix=".php">src</directory>
+    </include>
+    <exclude/>
+  </source>
 </phpunit>

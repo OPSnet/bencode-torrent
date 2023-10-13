@@ -6,7 +6,7 @@ namespace OrpheusNET\BencodeTorrent;
 
 class BencodeTest extends \PHPUnit\Framework\TestCase
 {
-    public function dataProvider(): array
+    public static function dataProvider(): array
     {
         return [
             ['i0e', 0],
@@ -47,7 +47,7 @@ class BencodeTest extends \PHPUnit\Framework\TestCase
         $bencode->decodeString('di1e5:valuee');
     }
 
-    public function invalidIntegers(): array
+    public static function invalidIntegers(): array
     {
         return [['-0'], ['a'], ['1.0']];
     }
