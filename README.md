@@ -10,13 +10,20 @@ PHP library for encoding and decoding BitTorrent BEncode data, focused around us
 
 Usage
 -----
+
 `composer require orpheusnet/bencode-torrent`
 
 ```php
 use OrpheusNET\BencodeTorrent;
-$bencode = new Bencode();
+$bencode = new BencodeTorrent();
 $bencode->decodeFile('path/to/file.torrent');
+var_dump($bencode->getName());
+var_dump($bencode->getHexInfoHash());
+var_dump($bencode->getFileList());
 ```
+
+See the [`BencodeTorrent`](src/BencodeTorrent.php) class for more information on the available methods.
+Additionally, see [`Bencode`](src/Bencode.php) for the underlying library to encode/decode BEncode data.
 
 Description
 -----------
