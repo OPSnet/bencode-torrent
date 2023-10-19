@@ -14,8 +14,8 @@ Usage
 `composer require orpheusnet/bencode-torrent`
 
 ```php
-use OrpheusNET\BencodeTorrent;
-$bencode = new BencodeTorrent();
+require('vendor/autoload.php');
+$bencode = new \OrpheusNET\BencodeTorrent\BencodeTorrent();
 $bencode->decodeFile('path/to/file.torrent');
 var_dump($bencode->getName());
 var_dump($bencode->getHexInfoHash());
